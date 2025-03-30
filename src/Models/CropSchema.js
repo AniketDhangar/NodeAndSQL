@@ -1,5 +1,5 @@
-import sequelize from "./Database.js";
-import { Sequelize, DataTypes } from "sequelize";
+const sequelize = require("./Database");
+const { Sequelize, DataTypes } = require("sequelize");
 
 const Crop = sequelize.define(
   "CropTable",
@@ -12,8 +12,11 @@ const Crop = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    cropGroup: {
+      type: DataTypes.STRING,
+    },
   },
   { timestamps: true }
 );
 
-export default Crop;
+module.exports = Crop;

@@ -1,6 +1,6 @@
-import sequelize from "./Database.js";
-import { Sequelize, DataTypes } from "sequelize";
-import Crop from "./CropSchema.js"; // Ensure this is imported first
+const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = require("./Database.js");
+const Crop = require("./CropSchema.js"); 
 
 const Variety = sequelize.define(
   "VarietyTable",
@@ -10,7 +10,7 @@ const Variety = sequelize.define(
       allowNull: false,
     },
     varietyCode: {
-      type: DataTypes.STRING, 
+      type: DataTypes.STRING,
       allowNull: false,
     },
     varietyGender: {
@@ -22,10 +22,9 @@ const Variety = sequelize.define(
       allowNull: false,
     },
 
-    // Image Fields (Allow NULL to prevent errors)
     varietyMaleImgOne: {
       type: DataTypes.STRING,
-      allowNull: true, // Changed from false
+      allowNull: true,
     },
     varietyMaleImgTwo: {
       type: DataTypes.STRING,
@@ -55,10 +54,10 @@ const Variety = sequelize.define(
         model: Crop, // Foreign key relation with CropTable
         key: "id",
       },
-      onDelete: "CASCADE", // Ensures varieties are deleted if crop is removed
+      onDelete: "CASCADE",
     },
   },
   { timestamps: true }
 );
 
-export default Variety;
+module.exports = Variety;

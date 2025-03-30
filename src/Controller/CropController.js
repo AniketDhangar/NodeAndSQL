@@ -1,5 +1,5 @@
-import Crop from "../Models/CropSchema.js";
-import Variety from "../Models/VarietySchema.js";
+const Crop = require("../Models/CropSchema");
+const Variety = require("../Models/VarietySchema");
 
 const addCrop = async (req, res) => {
   const { cropName, cropCode } = req.body;
@@ -58,4 +58,4 @@ const deleteCrop = async (req, res) => {
   }
 };
 
-export { addCrop, getCrop, deleteCrop };
+module.exports = { addCrop, getCrop, deleteCrop };

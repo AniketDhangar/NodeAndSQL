@@ -1,28 +1,34 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   addUser,
   deleteUser,
   getUsers,
   updateUser,
-} from "../Controller/UserController.js";
-import {
+  doLogin,
+} = require("../Controller/UserController.js");
+const {
   addVariety,
   deleteVariety,
   getVariety,
   updateVariety,
-} from "../Controller/VarietyController.js";
-import { addCrop, deleteCrop, getCrop } from "../Controller/CropController.js";
-import { uploader } from "../Middleware/MulterUploads.js";
+} = require("../Controller/VarietyController.js");
+const {
+  addCrop,
+  deleteCrop,
+  getCrop,
+} = require("../Controller/CropController.js");
+const uploader = require("../Middleware/MulterUploads.js");
+const authMiddleware = require("../Middleware/Auth.js");
 
 const router = express.Router();
 
-//user routes
+// User routes
 router.post("/addusers", addUser);
-router.get("/users", getUsers);
-router.put("/updateuser", updateUser);
-router.delete("/deleteduser", deleteUser);
+router.get("/users", authMiddleware, getUsers);
+router.put("/updateuser", authMiddleware, updateUser);
+router.delete("/deleteduser", authMiddleware, deleteUser);
 
-//variety route
+// Variety routes
 router.post(
   "/addvariety",
   uploader.fields([
@@ -36,13 +42,15 @@ router.post(
   ]),
   addVariety
 );
-router.get("/allvarieties", getVariety);
-router.put("/updatevariety", updateVariety);
-router.delete("/deletevariety", deleteVariety);
+router.get("/allvarieties", authMiddleware, getVariety);
+router.put("/updatevariety", authMiddleware, updateVariety);
+router.delete("/deletevariety", authMiddleware, deleteVariety);
 
-//crop route
+// Crop routes
 router.post("/addcrop", addCrop);
-router.get("/crops", getCrop);
-router.delete("/removecrop", deleteCrop);
+router.get("/crops", authMiddleware, getCrop);
+router.delete("/removecrop", authMiddleware, deleteCrop);
 
-export default router;
+router.post("/login", doLogin);
+
+module.exports = router;

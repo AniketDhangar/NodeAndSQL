@@ -1,30 +1,97 @@
-import sequelize from "../Models/Database.js";
-import User from "../Models/UserSchema.js";
+const sequelize = require("../Models/Database");
+const User = require("../Models/UserSchema");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-//add user
 const addUser = async (req, res) => {
-  const { userName, userMobile, userPassword } = req.body;
   try {
-    const isExistedUser = await User.findOne({ userMobile });
-    if (isExistedUser) {
-      return res.status(400).json({
-        message: "User already exists",
-      });
+    const { userPassword, userMobile } = req.body;
+    const salt = 10;
+
+    if (!userMobile || !userPassword) {
+      return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Secure password
-    const hashedPassword = await bcrypt.hash(userPassword, 10);
+    const existingUser = await User.findOne({ where: { userMobile } });
+    if (existingUser) {
+      return res.status(409).json({ message: "User is already registered." });
+    }
+
+    const hashedPassword = await bcrypt.hash(userPassword, salt);
 
     const addedUser = await User.create({
-      userName,
-      userMobile,
+      ...req.body,
       userPassword: hashedPassword,
     });
-    res.status(200).json(addedUser);
-    console.log("✅", addedUser);
+
+    console.log("✅ User added:", addedUser);
+    res
+      .status(201)
+      .json({ message: "User registered successfully.", user: addedUser });
   } catch (error) {
-    console.log("error to add user", error);
-    res.status(500).json(error);
+    console.error("❌ Error adding user:", error);
+    res.status(500).json({ message: "error in adding", error });
+  }
+};
+
+const doLogin = async (req, res) => {
+  try {
+    const { userMobile, userPassword,isBlock } = req.body;
+
+    if (!userMobile || !userPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Please fill in all details." });
+    }
+
+ 
+
+    const loggedUser = await User.findOne({ where: { userMobile } });
+    if (!loggedUser) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found." });
+    }
+
+    if (!loggedUser.userPassword) {
+      return res
+        .status(500)
+        .json({ success: false, message: "User password is missing." });
+    }
+    if (loggedUser.isBlock) {
+      return res
+        .status(403)
+        .json({ success: false, message: "User is blocked." });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(
+      userPassword,
+      loggedUser.userPassword
+    );
+    if (!isPasswordCorrect) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Incorrect password." });
+    }
+
+    //   JWT token
+    const payload = { id: loggedUser.id, userMobile: loggedUser.userMobile };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
+    console.log(token);
+    res.status(200).json({
+      success: true,
+      message: "Login successful.",
+      user: {
+        loggedUser,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("❌ Login error:", error);
+    res.status(500).json({ success: false, message: "Something went wrong." });
   }
 };
 
@@ -45,7 +112,7 @@ const deleteUser = async (req, res) => {
       },
     });
     res.status(200).json({ message: "User deleted successfully" });
-    console.log("delete ho gaya bhai");
+    console.log("deleted ");
   } catch (error) {
     res.status(500).json(error);
     console.log(error);
@@ -53,23 +120,40 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { userPassword, userMobile } = req.body;
   try {
+    const { uid, updatedPass, updatedMob,isBlock } = req.body;
+
+    let userPassword;
+    if (updatedPass) {
+      const salt = 10;
+      userPassword = await bcrypt.hash(updatedPass, salt);
+    }
+
     const updatedUser = await User.update(
       {
-        userPassword: req.body.updatedPass,
-        userMobile: req.body.updatedMob,
+        userPassword: userPassword,
+        userMobile: updatedMob,
+        isBlock: isBlock,
       },
-      {
-        where: { id: req.body.uid },
-      }
+      { where: { id: uid } }
     );
-    res.status(200).json(updatedUser);
-    console.log("updated hai");
+
+    if (updatedUser[0] === 0) {
+      return res
+        .status(404)
+        .json({ message: "User not found or no changes made" });
+    }
+
+    const user = await User.findOne({ where: { id: uid } });
+
+    res.status(200).json({ message: "User updated successfully", user });
+    console.log("User updated successfully");
   } catch (error) {
-    console.log("error hai", error);
-    res.status(500).json(error);
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Error updating user" });
   }
 };
 
-export { addUser, getUsers, updateUser, deleteUser };
+module.exports = updateUser;
+
+module.exports = { addUser, getUsers, updateUser, deleteUser, doLogin };

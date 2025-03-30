@@ -1,5 +1,5 @@
-import { Sequelize, DataTypes } from "sequelize";
-import sequelize from "./Database.js";
+const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = require("./Database.js");
 
 const User = sequelize.define(
   "UserTable",
@@ -11,19 +11,26 @@ const User = sequelize.define(
     userMobile: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     userPassword: {
       type: DataTypes.STRING,
       allowNull: false,
-    },userIsBlock:{
+    },
+    isBlock: {
       type: DataTypes.BOOLEAN,
-      defaultValue:false
-
-    }
+      defaultValue: false,
+    },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     timestamps: true,
   }
 );
-console.log(User === sequelize.models.UserTable); 
-export default User;
+
+console.log(User === sequelize.models.UserTable);
+
+module.exports = User;

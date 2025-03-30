@@ -1,7 +1,7 @@
-import Crop from "./CropSchema.js";
-import Variety from "./VarietySchema.js";
+const Crop = require("./CropSchema.js");
+const Variety = require("./VarietySchema.js");
 
 Crop.hasMany(Variety, { foreignKey: "cropId", as: "Varieties" });
 Variety.belongsTo(Crop, { foreignKey: "cropId", as: "Crop" });
 
-export { Crop, Variety };
+module.exports = { Crop, Variety };

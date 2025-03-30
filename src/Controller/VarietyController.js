@@ -1,46 +1,5 @@
-import Variety from "../Models/VarietySchema.js";
+const Variety = require("../Models/VarietySchema");
 
-//add variety
-
-// const addVariety = async (req, res) => {
-//   // Extract the necessary data from the request body
-//   const { varietyCode, varietyName, varietyGender, varietyDescription } =
-//     req.body;
-
-//    // Extract file paths from req.files (if they exist)
-//    const varietyMaleImgOne = req.files["varietyMaleImgOne"] ? req.files["varietyMaleImgOne"][0].path.replace(/\\/g, "/") : null;
-//    const varietyMaleImgTwo = req.files["varietyMaleImgTwo"] ? req.files["varietyMaleImgTwo"][0].path.replace(/\\/g, "/") : null;
-//    const varietyMaleImgThree = req.files["varietyMaleImgThree"] ? req.files["varietyMaleImgThree"][0].path.replace(/\\/g, "/") : null;
-//    const varietyFemaleImgOne = req.files["varietyFemaleImgOne"] ? req.files["varietyFemaleImgOne"][0].path.replace(/\\/g, "/") : null;
-//    const varietyFemaleImgTwo = req.files["varietyFemaleImgTwo"] ? req.files["varietyFemaleImgTwo"][0].path.replace(/\\/g, "/") : null;
-//    const varietyFemaleImgThree = req.files["varietyFemaleImgThree"] ? req.files["varietyFemaleImgThree"][0].path.replace(/\\/g, "/") : null;
- 
-
-//   // If there are any files uploaded, use the first one as the varietyImage; otherwise, set it to null
-//   // const varietyImage = filepaths.length > 0 ? filepaths[0] : null;
-
-//   try {
-//     // Create a new entry in the Variety table using the provided data
-//     const addedVar = await Variety.create({
-//       varietyCode,
-//       varietyName,
-//       varietyGender,
-//       varietyDescription,
-//       varietyMaleImgOne,
-//       varietyMaleImgTwo,
-//       varietyMaleImgThree,
-//       varietyFemaleImgOne,
-//       varietyFemaleImgtwo,
-//       varietyFemaleImgThree,
-//     });
-
-//     res.status(200).json(addedVar);
-//     console.log("Variety added successfully.");
-//   } catch (error) {
-//     console.error("Error adding variety: ", error);
-//     res.status(500).json({ error: "Failed to add variety." });
-//   }
-// };
 const addVariety = async (req, res) => {
   try {
     const { varietyCode, varietyName, varietyGender, varietyDescription, cropId } = req.body;
@@ -65,10 +24,6 @@ const addVariety = async (req, res) => {
     res.status(500).json({ error: "Failed to add variety." });
   }
 };
-
-
-export default addVariety;
-
 
 const getVariety = async (req, res) => {
   try {
@@ -110,4 +65,4 @@ const deleteVariety = async (req, res) => {
   }
 };
 
-export { addVariety, getVariety, updateVariety, deleteVariety };
+module.exports = { addVariety, getVariety, updateVariety, deleteVariety };

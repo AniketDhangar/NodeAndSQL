@@ -1,32 +1,31 @@
-import express from 'express'
-import router from './src/Routes/Route.js'
-import sequelize from './src/Models/Database.js'
-import './src/Models/References.js'
+const express = require("express");
+const router = require("./src/Routes/Route.js");
+const sequelize = require("./src/Models/Database.js");
+const authMiddleware = require("./src/Middleware/Auth.js");
+require("./src/Models/References.js");
+require('dotenv').config()
 
-const app = express()
-const PORT = 5000   
+const app = express();
 
-app.use(express.json())
-app.use(router)
 
-// multer image 
-app.use('/Uploads', express.static('Uploads'));
+app.use(express.json());
+app.use(router);
 
+app.use("/Uploads", express.static("Uploads"));
+
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
 
 // Sync Database
 sequelize
-  .sync({ force: true }) // Ensures tables exist without dropping data
+  .sync({ alter: true })
   .then(() => {
     console.log("✅ Database synced successfully!");
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
-    });
   })
   .catch((error) => {
     console.error("❌ Error syncing database:", error);
   });
-
-// Remove the redundant app.listen call
-// app.listen(PORT,()=>{
-//     console.log("server is running on port 3000")
-// })   
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`🚀 Server is running on port ${process.env.PORT}`);
+});
